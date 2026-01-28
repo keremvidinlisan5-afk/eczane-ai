@@ -38,7 +38,7 @@ def initialize_model(api_key):
 model = initialize_model(API_KEY)
 
 # --- ARAYÜZ ---
-st.title("🔬 Aybüke Eczanesi Uzman AI Asistanı")
+st.title("🔬 Karşıyaka'nın EN İYİ Eczanesinin AI Asistanı")
 st.markdown("---")
 
 with st.sidebar:
