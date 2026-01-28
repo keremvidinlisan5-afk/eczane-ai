@@ -5,7 +5,7 @@ import google.generativeai as genai
 API_KEY = "AIzaSyCdwedOJ5bfp-wwZXkv0s1mK5OesGHcFao"
 
 # Sayfa Yapılandırması
-st.set_page_config(page_title="Aybüke Eczanesi AI", layout="wide", page_icon="💊")
+st.set_page_config(page_title="Karşıyaka'nın EN İYİ Eczanesi", layout="wide", page_icon="💊")
 
 # 1. Gemini'yi Dinamik Olarak Başlatma
 def initialize_model(api_key):
