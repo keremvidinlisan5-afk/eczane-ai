@@ -1,32 +1,32 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- GÜVENLİ AYAR ---
-# API Key'i kodun içine yazmıyoruz, Streamlit'in 'Secrets' kısmından alacağız.
+# --- GÜVENLİ BAĞLANTI ---
+# API Key'i kodun içine yazma, Streamlit Secrets'tan alacağız
 try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    if "GEMINI_API_KEY" in st.secrets:
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    else:
+        st.error("API Anahtarı bulunamadı! Streamlit Secrets ayarını yapmalısın.")
+
+    # Mevcut modelleri tara ve çalışan ilkini seç
+    model_list = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+    target = 'models/gemini-1.5-flash' if 'models/gemini-1.5-flash' in model_list else model_list[0]
+    model = genai.GenerativeModel(target)
 except Exception as e:
-    st.error("API Anahtarı bulunamadı veya geçersiz. Lütfen Streamlit Secrets ayarını kontrol edin.")
+    st.error(f"Sistem başlatılamadı: {e}")
 
-# Sayfa Yapılandırması
-st.set_page_config(page_title="Karşıyaka Eczanesi AI", layout="wide", page_icon="💊")
-
-# Ana Başlık
+# --- ARAYÜZ ---
+st.set_page_config(page_title="Karşıyaka Eczanesi AI", layout="wide")
 st.title("🔬 Karşıyaka'nın En İyi Eczanesi | AI Asistanı")
-st.markdown("---")
 
-with st.sidebar:
-    st.header("📋 Hasta Analizi")
-    hikaye = st.text_area("Şikayeti Yazın:", placeholder="Örn: 22 yaş, rozalı cilt...", height=250)
-    analiz_et = st.button("Analiz Et ✨")
+hikaye = st.text_area("Hasta Şikayeti:", placeholder="Şikayeti buraya yazın...", height=200)
 
-if analiz_et and hikaye:
-    prompt = f"Sen Karşıyaka Eczanesi'nin uzmanısın. Müşteri şikayeti: {hikaye}. Uygun bir rutin öner."
-    with st.spinner("İnceleniyor..."):
-        try:
-            response = model.generate_content(prompt)
-            st.markdown(response.text)
-        except Exception as e:
-            st.error(f"Hata: {e}")
+if st.button("Analiz Et ✨"):
+    if hikaye:
+        with st.spinner("AI Eczacı inceliyor..."):
+            try:
+                response = model.generate_content(f"Sen bir eczacısın. Şikayet: {hikaye}. 3 rutin öner.")
+                st.markdown(response.text)
+            except Exception as e:
+                st.error(f"Hata oluştu: {e}")
